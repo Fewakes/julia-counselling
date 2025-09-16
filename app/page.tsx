@@ -23,56 +23,33 @@ export default function HomePage() {
     <div className="relative">
       {/* Header (full-bleed) */}
       <header className="sticky top-0 z-20 backdrop-blur supports-[backdrop-filter]:bg-white/60 dark:supports-[backdrop-filter]:bg-gray-950/40 border-b">
-        <div className="container h-14 flex items-center justify-between">
-          <Link href="/" className="font-semibold tracking-tight">
-            Julia Slojkowska, MSc
-          </Link>
+        <div className="container h-12 sm:h-14 flex items-center justify-between">
+          <div className="flex items-center gap-3 min-w-0">
+            <Link href="/" className="hidden sm:inline font-semibold tracking-tight">
+              Julia Slojkowska, MSc
+            </Link>
+            <nav className="flex sm:hidden items-center gap-3 text-sm text-gray-700 dark:text-gray-300">
+              <Link href="#about" className="hover:text-indigo-700 dark:hover:text-indigo-400">{t("nav_about")}</Link>
+              <Link href="#services" className="hover:text-indigo-700 dark:hover:text-indigo-400">{t("nav_services")}</Link>
+              <Link href="#contact" className="font-medium text-indigo-700 dark:text-indigo-300">{t("nav_contact")}</Link>
+            </nav>
+          </div>
           <nav className="hidden sm:flex items-center gap-3 text-sm text-gray-700 dark:text-gray-300">
-            <Link
-              href="#about"
-              className="hover:text-indigo-700 dark:hover:text-indigo-400"
-            >
-              {t("nav_about")}
-            </Link>
-            <Link
-              href="#approach"
-              className="hover:text-indigo-700 dark:hover:text-indigo-400"
-            >
-              {t("nav_approach")}
-            </Link>
-            <Link
-              href="#services"
-              className="hover:text-indigo-700 dark:hover:text-indigo-400"
-            >
-              {t("nav_services")}
-            </Link>
-            <Link
-              href="#reviews"
-              className="hover:text-indigo-700 dark:hover:text-indigo-400"
-            >
-              {t("nav_reviews")}
-            </Link>
-            <Link
-              href="#faq"
-              className="hover:text-indigo-700 dark:hover:text-indigo-400"
-            >
-              {t("nav_faq")}
-            </Link>
-            <Link
-              href="#contact"
-              className="font-medium text-indigo-700 dark:text-indigo-300"
-            >
-              {t("nav_contact")}
-            </Link>
-            <div className="flex items-center gap-2 ml-4">
+            <Link href="#about" className="hover:text-indigo-700 dark:hover:text-indigo-400">{t("nav_about")}</Link>
+            <Link href="#approach" className="hover:text-indigo-700 dark:hover:text-indigo-400">{t("nav_approach")}</Link>
+            <Link href="#services" className="hover:text-indigo-700 dark:hover:text-indigo-400">{t("nav_services")}</Link>
+            <Link href="#reviews" className="hover:text-indigo-700 dark:hover:text-indigo-400">{t("nav_reviews")}</Link>
+            <Link href="#faq" className="hover:text-indigo-700 dark:hover:text-indigo-400">{t("nav_faq")}</Link>
+            <Link href="#contact" className="font-medium text-indigo-700 dark:text-indigo-300">{t("nav_contact")}</Link>
+            <div className="flex items-center gap-2 ml-3">
               <ThemeToggle />
               <LanguageSwitcher />
             </div>
           </nav>
-        </div>
-        <div className="container sm:hidden flex items-center justify-end gap-2 py-2">
-          <ThemeToggle />
-          <LanguageSwitcher />
+          <div className="flex sm:hidden items-center gap-2">
+            <ThemeToggle />
+            <LanguageSwitcher />
+          </div>
         </div>
       </header>
 
@@ -89,22 +66,28 @@ export default function HomePage() {
               <ShieldCheck className="h-4 w-4 text-indigo-600" />{" "}
               {t("hero_badge")}
             </div>
-            <h1 className="text-4xl md:text-5xl font-bold tracking-tight">
-              {t("hero_title")}
-            </h1>
+            {/* Mobile title + avatar side by side */}
+            <div className="sm:hidden flex items-center gap-3">
+              <div className="relative h-20 w-20 rounded-full overflow-hidden border ring-2 ring-indigo-500/20 shadow-sm shrink-0 bg-white aspect-square">
+                <Image src={HERO_IMAGE_URL} alt="Portrait of Julia Slojkowska" fill sizes="80px" priority className="object-cover object-[0%_70%]" />
+              </div>
+              <h1 className="text-3xl font-bold tracking-tight">{t("hero_title")}</h1>
+            </div>
+            {/* Desktop title */}
+            <h1 className="hidden sm:block text-4xl md:text-5xl font-bold tracking-tight">{t("hero_title")}</h1>
             <p className="text-gray-700 dark:text-gray-300 max-w-prose">
               {t("hero_intro")}
             </p>
-            <div className="flex flex-wrap gap-3">
+            <div className="grid grid-cols-2 gap-2 sm:flex sm:flex-wrap sm:gap-3">
               <Link
                 href="#contact"
-                className="px-6 py-3 rounded-lg bg-indigo-600 text-white hover:bg-indigo-700 transition dark:bg-indigo-500 dark:hover:bg-indigo-600"
+                className="w-full sm:w-auto px-4 py-2 text-sm sm:px-6 sm:py-3 sm:text-base rounded-lg bg-indigo-600 text-white hover:bg-indigo-700 transition dark:bg-indigo-500 dark:hover:bg-indigo-600 text-center"
               >
                 {t("hero_cta_primary")}
               </Link>
               <Link
                 href="#about"
-                className="px-6 py-3 rounded-lg border border-indigo-600 text-indigo-700 hover:bg-indigo-50 dark:text-indigo-300 dark:border-indigo-400 transition"
+                className="w-full sm:w-auto px-4 py-2 text-sm sm:px-6 sm:py-3 sm:text-base rounded-lg border border-indigo-600 text-indigo-700 hover:bg-indigo-50 dark:text-indigo-300 dark:border-indigo-400 transition text-center"
               >
                 {t("hero_cta_secondary")}
               </Link>
@@ -122,7 +105,7 @@ export default function HomePage() {
             </div>
           </div>
 
-          <div className="relative mx-auto w-full max-w-xl">
+          <div className="hidden sm:block relative mx-auto w-full max-w-xl">
             <div className="relative aspect-[4/3] overflow-hidden rounded-2xl border bg-white/60 dark:bg-gray-900/40">
               <Image
                 src={HERO_IMAGE_URL}

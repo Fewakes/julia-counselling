@@ -254,8 +254,8 @@ export function LanguageSwitcher() {
       className="inline-flex h-9 items-center rounded-md border px-3 py-1.5 text-sm bg-white/70 dark:bg-gray-900/40"
       aria-label="Language selector"
     >
-      <option value="en">English</option>
-      <option value="pl">Polski</option>
+      <option value="en">🇬🇧 English</option>
+      <option value="pl">🇵🇱 Polski</option>
     </select>
   );
 }

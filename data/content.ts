@@ -1,11 +1,7 @@
-// Centralised content and image URLs to keep page lean and maintainable
+export const HERO_IMAGE = "/julia2.jpeg";
 
-export const HERO_IMAGE = "/julia2.jpeg"; // Your wife's portrait in /public
-
-// Therapy-themed gallery images (reliable Unsplash direct links)
 export const galleryImages = ["/Image1.jpg", "/Image2.jpeg", "/Image3.jpg"];
 
-// Services with representative imagery (right-aligned inside cards)
 export const services = [
   {
     title: "Adults",
@@ -69,6 +65,6 @@ export const testimonials = [
     name: "Agnieszka W.",
     location: "Gdańsk",
     avatar:
-      "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=256&q=60",
+      "https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?auto=format&fit=crop&w=256&q=60",
   },
 ];
