@@ -25,7 +25,7 @@ export default function HomePage() {
       <header className="sticky top-0 z-20 backdrop-blur supports-[backdrop-filter]:bg-white/60 dark:supports-[backdrop-filter]:bg-gray-950/40 border-b">
         <div className="container h-12 sm:h-14 flex items-center justify-between">
           <div className="flex items-center gap-3 min-w-0">
-            <Link href="/" className="hidden sm:inline font-semibold tracking-tight">
+            <Link href="/" className="hidden lg:inline font-semibold tracking-tight">
               Julia Slojkowska, MSc
             </Link>
             <nav className="flex sm:hidden items-center gap-3 text-sm text-gray-700 dark:text-gray-300">
@@ -60,7 +60,7 @@ export default function HomePage() {
           className="absolute inset-0 bg-gradient-to-b from-sky-50 to-white dark:from-indigo-950/30 dark:to-transparent"
         />
         <div aria-hidden className="absolute inset-0 bg-grid opacity-50" />
-        <div className="container grid md:grid-cols-2 gap-10 items-center relative">
+        <div className="container grid lg:grid-cols-2 gap-10 items-center relative">
           <div className="space-y-6 animate-fade-in">
             <div className="inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs text-gray-600 dark:text-gray-300 bg-white/70 dark:bg-gray-900/40">
               <ShieldCheck className="h-4 w-4 text-indigo-600" />{" "}
@@ -81,13 +81,13 @@ export default function HomePage() {
             <div className="grid grid-cols-2 gap-2 sm:flex sm:flex-wrap sm:gap-3">
               <Link
                 href="#contact"
-                className="w-full sm:w-auto px-4 py-2 text-sm sm:px-6 sm:py-3 sm:text-base rounded-lg bg-indigo-600 text-white hover:bg-indigo-700 transition dark:bg-indigo-500 dark:hover:bg-indigo-600 text-center"
+                className="w-full sm:w-auto px-4 py-2 text-sm sm:px-6 sm:py-3 sm:text-base rounded-lg bg-indigo-600 text-white hover:bg-indigo-700 transition dark:bg-indigo-500 dark:hover:bg-indigo-600 inline-flex items-center justify-center text-center"
               >
                 {t("hero_cta_primary")}
               </Link>
               <Link
                 href="#about"
-                className="w-full sm:w-auto px-4 py-2 text-sm sm:px-6 sm:py-3 sm:text-base rounded-lg border border-indigo-600 text-indigo-700 hover:bg-indigo-50 dark:text-indigo-300 dark:border-indigo-400 transition text-center"
+                className="w-full sm:w-auto px-4 py-2 text-sm sm:px-6 sm:py-3 sm:text-base rounded-lg border border-indigo-600 text-indigo-700 hover:bg-indigo-50 dark:text-indigo-300 dark:border-indigo-400 transition inline-flex items-center justify-center text-center"
               >
                 {t("hero_cta_secondary")}
               </Link>
@@ -134,7 +134,7 @@ export default function HomePage() {
             {galleryImgs.map((src, i) => (
               <div
                 key={i}
-                className="group relative h-48 sm:h-56 md:h-48 rounded-xl overflow-hidden border bg-white/60 dark:bg-gray-900/40"
+                className="group relative h-48 sm:h-56 md:h-48 rounded-xl overflow-hidden border bg-white/60 dark:bg-gray-900/40 transition hover:shadow-sm"
               >
                 <Image
                   src={src}
@@ -239,7 +239,7 @@ export default function HomePage() {
               <Reveal
                 as="li"
                 key={i}
-                className="rounded-md border p-3 flex items-start gap-2 bg-white/60 dark:bg-gray-950/40"
+                className="rounded-md border p-3 flex items-start gap-2 bg-white/60 dark:bg-gray-950/40 transition hover:shadow-sm"
                 delay={i * 80}
               >
                 <CheckCircle2 className="h-4 w-4 mt-0.5 flex-none text-indigo-600" />{" "}
@@ -292,7 +292,7 @@ export default function HomePage() {
             ].map((card, i) => (
               <Reveal
                 key={i}
-                className="rounded-xl border p-0 bg-white/80 dark:bg-gray-900/50 backdrop-blur hover:shadow-sm transition overflow-hidden min-h-[180px]"
+                className="rounded-xl border p-0 bg-white/80 dark:bg-gray-900/50 backdrop-blur overflow-hidden min-h-[180px] transition hover:shadow-sm"
                 delay={i * 80}
               >
                 <div className="relative flex h-full">
@@ -357,7 +357,7 @@ export default function HomePage() {
             title={t("sec_availability_title")}
           />
           <div className="mt-6 grid md:grid-cols-3 gap-4 text-gray-700 dark:text-gray-300">
-            <div className="rounded-xl border p-6 bg-white/70 dark:bg-gray-900/40">
+            <div className="rounded-xl border p-6 bg-white/70 dark:bg-gray-900/40 transition hover:shadow-sm">
               <div className="relative h-32 w-full rounded-lg overflow-hidden mb-4">
                 <Image src="/intro.jpg" alt={t("work_step1_title")} fill sizes="(max-width:768px) 100vw, 33vw" className="object-cover" />
               </div>
@@ -371,7 +371,7 @@ export default function HomePage() {
                 <li className="flex items-start gap-2"><CheckCircle2 className="h-4 w-4 mt-0.5 text-indigo-600" /> {t("work_step1_l3")}</li>
               </ul>
             </div>
-            <div className="rounded-xl border p-6 bg-white/70 dark:bg-gray-900/40">
+            <div className="rounded-xl border p-6 bg-white/70 dark:bg-gray-900/40 transition hover:shadow-sm">
               <div className="relative h-32 w-full rounded-lg overflow-hidden mb-4">
                 <Image src="/first.jpg" alt={t("work_step2_title")} fill sizes="(max-width:768px) 100vw, 33vw" className="object-cover" />
               </div>
@@ -385,7 +385,7 @@ export default function HomePage() {
                 <li className="flex items-start gap-2"><CheckCircle2 className="h-4 w-4 mt-0.5 text-indigo-600" /> {t("work_step2_l3")}</li>
               </ul>
             </div>
-            <div className="rounded-xl border p-6 bg-white/70 dark:bg-gray-900/40">
+            <div className="rounded-xl border p-6 bg-white/70 dark:bg-gray-900/40 transition hover:shadow-sm">
               <div className="relative h-32 w-full rounded-lg overflow-hidden mb-4">
                 <Image src="/ongoing.jpg" alt={t("work_step3_title")} fill sizes="(max-width:768px) 100vw, 33vw" className="object-cover" />
               </div>
@@ -424,7 +424,7 @@ export default function HomePage() {
             ].map((item, i) => (
               <div
                 key={i}
-                className="rounded-xl border p-5 bg-white/70 dark:bg-gray-900/40 animate-fade-in"
+                className="rounded-xl border p-5 bg-white/70 dark:bg-gray-900/40 animate-fade-in transition hover:shadow-sm"
                 style={{ animationDelay: `${0.04 * i}s` }}
               >
                 <div className="font-medium">{item.q}</div>
@@ -449,16 +449,16 @@ export default function HomePage() {
               <h2 className="text-3xl font-semibold">{t("cta_title")}</h2>
               <p className="mt-2 text-white/90">{t("cta_desc")}</p>
             </div>
-            <div className="flex md:justify-end items-center gap-3">
+            <div className="flex md:justify-end items-center gap-3 flex-wrap">
               <Link
                 href="#contact"
-                className="px-6 py-3 rounded-lg bg-white text-indigo-700 font-medium hover:bg-indigo-50 transition"
+                className="px-4 py-2 text-sm sm:px-6 sm:py-3 sm:text-base rounded-lg bg-white text-indigo-700 font-medium hover:bg-indigo-50 transition whitespace-nowrap"
               >
                 {t("cta_btn")}
               </Link>
               <a
                 href="tel:+0000000000"
-                className="px-6 py-3 rounded-lg border border-white/70 hover:bg-white/10 transition"
+                className="px-4 py-2 text-sm sm:px-6 sm:py-3 sm:text-base rounded-lg border border-white/70 hover:bg-white/10 transition whitespace-nowrap"
               >
                 {t("cta_call")}
               </a>

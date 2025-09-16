@@ -4,13 +4,13 @@ import ClientProviders from "../providers/ClientProviders";
 import { siteUrl } from "../lib/site";
 
 export const metadata: Metadata = {
-  title: "Julia Slojkowska, MSc | Psychotherapist & Counsellor",
+  title: "Julia’s Counselling | Psychotherapy & Counselling",
   description:
     "Professional therapy for children and adults. Online sessions available in the UK, Poland, and worldwide.",
   icons: {
-    icon: "/favicon.ico",
-    shortcut: "/favicon.ico",
-    apple: "/favicon.ico",
+    icon: "/favicon.svg",
+    shortcut: "/favicon.svg",
+    apple: "/favicon.svg",
   },
   metadataBase: new URL(siteUrl),
   alternates: { canonical: "/" },
@@ -30,11 +30,11 @@ export const metadata: Metadata = {
     "online therapy",
   ],
   openGraph: {
-    title: "Julia Slojkowska, MSc | Psychotherapist & Counsellor",
+    title: "Julia’s Counselling | Psychotherapy & Counselling",
     description:
       "Professional therapy for children and adults. Online sessions available in the UK, Poland, and worldwide.",
     url: "/",
-    siteName: "Julia Slojkowska Counselling",
+    siteName: "Julia’s Counselling",
     type: "website",
     images: [
       {
@@ -47,7 +47,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Julia Slojkowska, MSc | Psychotherapist & Counsellor",
+    title: "Julia’s Counselling | Psychotherapy & Counselling",
     description:
       "Professional therapy for children and adults. Online sessions available in the UK, Poland, and worldwide.",
     images: ["/julia.jpeg"],
