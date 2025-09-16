@@ -18,6 +18,34 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 
 You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
+## Project structure (custom additions)
+
+- `app/` – App Router pages and routes
+  - `app/page.tsx` – Landing page (sections are componentized and responsive)
+  - `app/api/contact/route.ts` – Serverless email endpoint for the contact form
+  - `app/thanks/page.tsx` – Contact success page
+  - `app/contact/error/page.tsx` – Contact error page
+- `components/` – Reusable UI
+  - `SectionHeader.tsx` – Consistent section titles + underline accent
+  - `Reveal.tsx` – IntersectionObserver reveal-on-scroll wrapper
+- `data/content.ts` – Central place to manage image paths and copy (hero, gallery, services, testimonials)
+- `public/` – Static assets (e.g., `julia.jpeg`, `Image1.jpg`, `adulttherapy.jpeg`)
+
+## Content updates
+
+- Hero photo: replace `public/julia.jpeg` and it will update automatically.
+- Gallery: update `public/Image1.jpg`, `public/Image2.jpeg`, `public/Image3.jpg`.
+- Service images: `public/adulttherapy.jpeg`, `public/childrentherapy.jpg`, `public/traumatherapy.jpg`.
+- Testimonials: update quotes/avatars in `data/content.ts` if you prefer managing content centrally.
+
+## SEO & performance
+
+- Metadata: set in `app/layout.tsx` (title, description, icons, OpenGraph/Twitter).
+- Sitemap/robots: `app/sitemap.ts` and `app/robots.txt`.
+- Structured data (JSON-LD): embedded in `app/page.tsx`.
+- Images: local images use `next/image`; remote Unsplash domains are allowed via `next.config.ts`.
+- Smooth scrolling: enabled with header offset in `app/globals.css`.
+
 This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
 ## Learn More
