@@ -1,0 +1,13 @@
+import { EditorialPage } from "../../../components/EditorialPage";
+import { pageMetadata } from "../../../lib/seo";
+
+export const metadata = pageMetadata("Counselling Approach | Julia Slojkowska", "How a thoughtful, individualised counselling conversation can make room for a young person's own perspective.", "/uk/approach/");
+
+export default function ApproachUK() {
+  return <EditorialPage market="uk" eyebrow="APPROACH" title="No young person should have to fit a formula." description="The way counselling works should make sense for the person in the room, not ask them to adapt to a standard script." sections={[
+    { eyebrow: "RELATIONSHIP", title: "Trust is part of the work.", paragraphs: ["A young person may need time to decide whether an adult feels safe to talk to. Julia aims to meet them with curiosity, respect and a pace that leaves room for their own view.", "A session is a conversation, not an interrogation. It is fine to begin with uncertainty or to ask how the process works."], tone: "white" },
+    { eyebrow: "INDIVIDUAL", title: "Adapt to age, context and communication.", paragraphs: ["Some children talk readily; others communicate through examples, drawing or practical activities. Teenagers may want a direct conversation or time to work out what feels relevant. The approach can adjust to the person rather than treat one format as universal."], points: ["Notice strengths as well as difficult moments", "Understand the home, school and relationship context", "Agree together what feels worth exploring", "Review whether the work remains useful"] },
+    { eyebrow: "PARENTS", title: "Include parents thoughtfully.", paragraphs: ["Parents have context and can help a young person feel supported between conversations. Their involvement should be discussed in a way that also respects the young person’s privacy and age-appropriate independence.", "Confidentiality and its limits should be explained before ongoing work. Specific arrangements depend on circumstances and professional responsibilities."], links: [{ href: "/uk/parent-consultations/", label: "Read about parent consultations" }, { href: "/uk/faq/", label: "Read common questions" }], tone: "sage" },
+    { eyebrow: "SCOPE", title: "A clear conversation about what is and is not offered.", paragraphs: ["Julia’s professional training is in counselling and psychotherapy, alongside an undergraduate degree in psychology. Specific methods, registrations and UK eligibility should not be assumed; ask about them when enquiring.", "Support does not replace urgent or specialist services where those are needed."], tone: "white" },
+  ]} />;
+}

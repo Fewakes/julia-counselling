@@ -1,93 +1,55 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useRef, useState } from "react";
+import { trackPublicEvent } from "../lib/analytics";
 
-export default function ContactForm() {
-  const [loading, setLoading] = useState(false);
-  const [toast, setToast] = useState<{ type: "success" | "error"; text: string } | null>(null);
-  const nameRef = useRef<HTMLInputElement>(null);
-  const emailRef = useRef<HTMLInputElement>(null);
-  const messageRef = useRef<HTMLTextAreaElement>(null);
+type MarketCode = "QA" | "GB" | "PL";
+type FormCopy = { name: string; email: string; phone: string; age: string; preferred: string; emailMethod: string; phoneMethod: string; seeking: string; child: string; teen: string; parent: string; unsure: string; message: string; placeholder: string; consent: string; privacy: string; send: string; sending: string; success: string; error: string };
+const labels: Record<MarketCode, FormCopy> = {
+  QA: { name: "Your name", email: "Email address", phone: "Phone (optional)", age: "Child or teenager’s age (optional)", preferred: "Preferred way to reply", emailMethod: "Email", phoneMethod: "Phone", seeking: "I'm seeking support for", child: "A child", teen: "A teenager", parent: "A parent consultation", unsure: "I'm not sure yet", message: "Short message", placeholder: "A brief note about what you would like to discuss is enough.", consent: "I agree to be contacted about this enquiry.", privacy: "Please avoid including diagnoses, detailed personal histories or emergency information.", send: "Send an enquiry", sending: "Sending…", success: "Thank you for getting in touch. Your message has been received. Julia will respond as soon as possible with information about the next step.", error: "We could not send your enquiry just now. Please try again later." },
+  GB: { name: "Your name", email: "Email address", phone: "Phone (optional)", age: "Child or teenager’s age (optional)", preferred: "Preferred way to reply", emailMethod: "Email", phoneMethod: "Phone", seeking: "I'm enquiring about", child: "Child counselling", teen: "Teen counselling", parent: "A parent consultation", unsure: "I'm not sure yet", message: "A short message", placeholder: "A brief note about what you would like to ask is enough.", consent: "I agree to be contacted about this enquiry.", privacy: "Please avoid diagnoses, detailed personal histories or emergency information.", send: "Send enquiry", sending: "Sending…", success: "Thank you for getting in touch. Your message has been received. Julia will respond as soon as possible with information about the next step.", error: "We could not send your enquiry just now. Please try again later." },
+  PL: { name: "Imię", email: "Adres e-mail", phone: "Telefon (opcjonalnie)", age: "Wiek dziecka lub nastolatka (opcjonalnie)", preferred: "Preferowana forma odpowiedzi", emailMethod: "E-mail", phoneMethod: "Telefon", seeking: "Szukam informacji na temat", child: "Wsparcia dla dziecka", teen: "Wsparcia dla nastolatka lub nastolatki", parent: "Konsultacji dla rodzica", unsure: "Jeszcze nie wiem", message: "Krótka wiadomość", placeholder: "Krótko napisz, o co chcesz zapytać.", consent: "Zgadzam się na kontakt w sprawie mojego zapytania.", privacy: "Nie wpisuj diagnoz, szczegółowej historii zdrowia ani informacji o nagłym zagrożeniu.", send: "Wyślij wiadomość", sending: "Wysyłanie…", success: "Dziękuję za wiadomość. Julia odpowie, gdy tylko będzie mogła, i napisze o możliwym kolejnym kroku.", error: "Nie udało się teraz wysłać wiadomości. Spróbuj ponownie później." },
+};
 
-  useEffect(() => {
-    if (!toast) return;
-    const id = setTimeout(() => setToast(null), 5000);
-    return () => clearTimeout(id);
-  }, [toast]);
+export default function ContactForm({ market }: { market: MarketCode }) {
+  const copy = labels[market];
+  const [status, setStatus] = useState<"idle" | "sending" | "success" | "error">("idle");
+  const started = useRef(false);
 
-  async function onSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    if (loading) return;
-    const name = nameRef.current?.value.trim() || "";
-    const email = emailRef.current?.value.trim() || "";
-    const message = messageRef.current?.value.trim() || "";
-    if (!name || !email || !message) {
-      setToast({ type: "error", text: "Please complete all fields." });
-      return;
-    }
-    setLoading(true);
+  function startForm() {
+    if (started.current) return;
+    started.current = true;
+    trackPublicEvent("form_started", { market, pagePath: window.location.pathname });
+  }
+
+  async function submit(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    if (status === "sending") return;
+    const form = event.currentTarget;
+    const data = new FormData(form);
+    setStatus("sending");
     try {
-      const res = await fetch("/api/contact", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, email, message }),
-      });
-      const data = await res.json().catch(() => ({ ok: false }));
-      if (res.ok && data.ok) {
-        setToast({ type: "success", text: "Message sent. We’ll get back to you shortly." });
-        if (nameRef.current) nameRef.current.value = "";
-        if (emailRef.current) emailRef.current.value = "";
-        if (messageRef.current) messageRef.current.value = "";
-      } else {
-        const reason = (data && (data.reason as string)) || "unknown";
-        let text = "Could not send right now. Please try again.";
-        if (reason === "email_not_configured") text = "Email is not configured yet. Please email us directly at julia.chwascinska@gmail.com.";
-        if (reason === "email_send_failed") {
-          text = "Email provider rejected the request. Please try again or email us directly at julia.chwascinska@gmail.com.";
-        }
-        setToast({ type: "error", text });
-        if (nameRef.current) nameRef.current.value = "";
-        if (emailRef.current) emailRef.current.value = "";
-        if (messageRef.current) messageRef.current.value = "";
-      }
+      const response = await fetch("/api/contact", { method: "POST", body: JSON.stringify(Object.fromEntries(data)), headers: { "Content-Type": "application/json" } });
+      const result = await response.json().catch(() => ({ ok: false }));
+      if (!response.ok || !result.ok) throw new Error("Unable to send");
+      form.reset();
+      trackPublicEvent("form_completed", { market, pagePath: window.location.pathname });
+      setStatus("success");
     } catch {
-      setToast({ type: "error", text: "Network error. Please try again." });
-      if (nameRef.current) nameRef.current.value = "";
-      if (emailRef.current) emailRef.current.value = "";
-      if (messageRef.current) messageRef.current.value = "";
-    } finally {
-      setLoading(false);
+      setStatus("error");
     }
   }
 
-  return (
-    <div className="relative">
-      {toast && (
-        <div className={`fixed z-40 top-4 right-4 px-4 py-3 rounded-md shadow border ${toast.type === "success" ? "bg-white/90 border-green-300 text-green-800 dark:bg-gray-900/80 dark:text-green-300" : "bg-white/90 border-red-300 text-red-800 dark:bg-gray-900/80 dark:text-red-300"}`} role="status" aria-live="polite">
-          {toast.text}
-        </div>
-      )}
-      <form onSubmit={onSubmit} className="mt-6 max-w-2xl mx-auto rounded-2xl border bg-white/80 dark:bg-gray-900/50 backdrop-blur shadow-sm p-6 space-y-4">
-        <div className="grid sm:grid-cols-2 gap-4">
-          <div>
-            <label className="block text-sm font-medium mb-1" htmlFor="name">Your name</label>
-            <input id="name" name="name" type="text" className="w-full field" placeholder="Jane Doe" ref={nameRef} required />
-          </div>
-          <div>
-            <label className="block text-sm font-medium mb-1" htmlFor="email">Email</label>
-            <input id="email" name="email" type="email" className="w-full field" placeholder="you@example.com" ref={emailRef} required />
-          </div>
-        </div>
-        <div>
-          <label className="block text-sm font-medium mb-1" htmlFor="message">Your message</label>
-          <textarea id="message" name="message" className="w-full min-h-32 field" placeholder="Briefly describe what you’d like support with." ref={messageRef} required />
-        </div>
-        <div className="flex items-center justify-center gap-3">
-          <button type="submit" disabled={loading} className="px-6 py-3 rounded-lg bg-indigo-600 text-white hover:bg-indigo-700 transition disabled:opacity-60 disabled:cursor-not-allowed dark:bg-indigo-500 dark:hover:bg-indigo-600">
-            {loading ? "Sending…" : "Send enquiry"}
-          </button>
-        </div>
-      </form>
-    </div>
-  );
+  return <form className="contact-form" action="/api/contact" method="post" onSubmit={submit} onFocusCapture={startForm} lang={market === "PL" ? "pl" : "en"}>
+    <input type="hidden" name="market" value={market} />
+    <div className="form-row"><label>{copy.name}<input name="name" autoComplete="name" maxLength={100} required /></label><label>{copy.email}<input type="email" name="email" autoComplete="email" maxLength={200} required /></label></div>
+    <div className="form-row"><label>{copy.phone}<input name="phone" type="tel" autoComplete="tel" maxLength={40} /></label><label>{copy.seeking}<select name="supportFor" defaultValue="unsure" required><option value="child">{copy.child}</option><option value="teen">{copy.teen}</option><option value="parent">{copy.parent}</option><option value="unsure">{copy.unsure}</option></select></label></div>
+    <div className="form-row"><label>{copy.age}<input name="age" inputMode="numeric" maxLength={2} pattern="[0-9]{1,2}" /></label><label>{copy.preferred}<select name="preferredContact" defaultValue="email"><option value="email">{copy.emailMethod}</option><option value="phone">{copy.phoneMethod}</option></select></label></div>
+    <label>{copy.message}<textarea name="message" rows={4} maxLength={1200} placeholder={copy.placeholder} required /></label>
+    <label className="consent"><input name="consent" type="checkbox" value="yes" required /><span>{copy.consent}</span></label>
+    <label className="honeypot" aria-hidden="true">Leave this field empty<input name="company" tabIndex={-1} autoComplete="off" /></label>
+    <p className="form-privacy">{copy.privacy} {market === "PL" ? "Treść formularza nie jest przekazywana do statystyk strony." : "Your form contents are not sent to website analytics."}</p>
+    <button className="button" type="submit" disabled={status === "sending"}>{status === "sending" ? copy.sending : copy.send}<span aria-hidden="true">→</span></button>
+    <p className="form-status" role="status" aria-live="polite">{status === "success" ? copy.success : status === "error" ? copy.error : ""}</p>
+  </form>;
 }

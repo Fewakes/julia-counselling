@@ -1,0 +1,13 @@
+import { EditorialPage } from "../../../components/EditorialPage";
+import { pageMetadata } from "../../../lib/seo";
+
+export const metadata = pageMetadata("O mnie | Julia Slojkowska", "Poznaj wykształcenie i doświadczenie Julii Slojkowskiej w pracy z dziećmi, młodzieżą i rodzinami.", "/pl/o-mnie/");
+
+export default function AboutPL() {
+  return <EditorialPage market="pl" eyebrow="O MNIE" title="Doświadczenie z różnych krajów. Uważność na konkretną osobę." description="Nazywam się Julia Slojkowska. W pracy z dziećmi, młodzieżą i rodzicami łączę wykształcenie z psychologii oraz counsellingu i psychoterapii z doświadczeniem zdobywanym w kilku krajach." sections={[
+    { eyebrow: "WYKSZTAŁCENIE", title: "Psychologia oraz counselling i psychoterapia.", paragraphs: ["Ukończyłam studia licencjackie z psychologii na De Montfort University oraz studia magisterskie z counsellingu i psychoterapii na Keele University w Wielkiej Brytanii. To przygotowanie daje mi podstawy do uważnego myślenia o emocjach, rozwoju i relacjach."], points: ["MSc Counselling & Psychotherapy — Keele University, Wielka Brytania", "BSc Psychology — De Montfort University, Wielka Brytania"] },
+    { eyebrow: "DOŚWIADCZENIE", title: "Ponad osiem lat pracy w różnych kontekstach.", paragraphs: ["Moje doświadczenie zawodowe obejmuje Katar, Wielką Brytanię i Polskę. Pracowałam w otoczeniu związanym ze szkołą, dobrostanem dzieci i młodzieży oraz dodatkowymi potrzebami edukacyjnymi.", "Zmiana kraju, szkoły czy języka może wpływać na życie rodziny na wiele sposobów. Nie zakładam jednak, że każde dziecko przeżywa takie doświadczenia tak samo."], tone: "white" },
+    { eyebrow: "W RELACJI", title: "Najpierw ciekawość, nie gotowa ocena.", paragraphs: ["Chcę rozumieć, co dziecko lub nastolatek przeżywa z własnej perspektywy. Nie trzeba opowiadać wszystkiego od razu ani mieć jasno określonego celu. Ważne jest tempo, które daje przestrzeń na zaufanie i pytania.", "Rodzice wnoszą ważną wiedzę o codzienności dziecka. Ich perspektywa może pomóc zobaczyć pełniejszy obraz, z jednoczesnym poszanowaniem prywatności młodej osoby."], links: [{ href: "/pl/moje-podejscie/", label: "Jak wygląda moje podejście" }, { href: "/pl/konsultacje-dla-rodzicow/", label: "Informacje dla rodziców" }] },
+    { eyebrow: "ZAKRES I ORGANIZACJA", title: "Warto najpierw zapytać o możliwość współpracy.", paragraphs: ["Możliwość spotkań, ich forma i warunki organizacyjne zależą od aktualnych ustaleń. Potwierdzam je indywidualnie po otrzymaniu krótkiego zapytania.", "Nie publikuję tutaj informacji o członkostwach ani uprawnieniach zawodowych, których nie przekazano do weryfikacji."], tone: "sage" },
+  ]} />;
+}

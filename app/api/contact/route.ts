@@ -2,6 +2,23 @@ import { NextResponse } from "next/server";
 import { RESEND_API_KEY, CONTACT_FROM_DEFAULT, CONTACT_TO_DEFAULT } from "../../../lib/utils";
 import { siteUrl } from "../../../lib/site";
 
+const submissions = new Map<string, number[]>();
+const WINDOW_MS = 10 * 60 * 1000;
+const MAX_SUBMISSIONS = 5;
+
+function overLimit(key: string, now = Date.now()): boolean {
+  if (submissions.size > 1000) {
+    for (const [address, times] of submissions) {
+      if (!times.some((time) => now - time < WINDOW_MS)) submissions.delete(address);
+    }
+  }
+  const recent = (submissions.get(key) ?? []).filter((time) => now - time < WINDOW_MS);
+  if (recent.length >= MAX_SUBMISSIONS) return true;
+  recent.push(now);
+  submissions.set(key, recent);
+  return false;
+}
+
 function escapeHtml(input: string): string {
   return input
     .replaceAll("&", "&amp;")
@@ -11,15 +28,15 @@ function escapeHtml(input: string): string {
     .replaceAll("'", "&#39;");
 }
 
-function buildEmailHtml({ name, email, message }: { name: string; email: string; message: string }) {
+function buildEmailHtml({ name, email, message, phone, supportFor, age, preferredContact, market }: { name: string; email: string; message: string; phone: string; supportFor: string; age: string; preferredContact: string; market: string }) {
   const safeMsg = escapeHtml(message);
-  const brand = "#4f46e5"; // indigo-600
+  const brand = "#315b4d";
   const textMuted = "#6b7280"; // gray-500
   const bg = "#f8fafc"; // slate-50
   const card = "#ffffff";
-  const logo = `${siteUrl}/julia.jpeg`;
-  const mailto = `mailto:${email}`;
-  const contactUrl = `${siteUrl}#contact`;
+  const logo = `${siteUrl}/julia2.jpeg`;
+  const mailto = `mailto:${encodeURIComponent(email)}`;
+  const contactUrl = `${siteUrl}/qatar/contact/`;
   return `
   <!doctype html>
   <html lang="en">
@@ -41,6 +58,15 @@ function buildEmailHtml({ name, email, message }: { name: string; email: string;
           <td style="padding:24px 24px 8px 24px;">
             <div style="font-size:18px;font-weight:600;">From: ${escapeHtml(name)}</div>
             <div style="margin-top:4px;font-size:14px;color:${textMuted};">Email: <a href="${mailto}" style="color:${brand};text-decoration:none;">${escapeHtml(email)}</a></div>
+          </td>
+        </tr>
+        <tr>
+          <td style="padding:8px 24px 0 24px;font-size:14px;line-height:1.8;color:#374151;">
+            <div>Market: ${escapeHtml(market)}</div>
+            <div>Phone: ${escapeHtml(phone || "Not provided")}</div>
+            <div>Seeking support for: ${escapeHtml(supportFor)}</div>
+            <div>Age: ${escapeHtml(age || "Not provided")}</div>
+            <div>Preferred reply: ${escapeHtml(preferredContact)}</div>
           </td>
         </tr>
         <tr>
@@ -93,15 +119,21 @@ async function sendEmail(opts: {
     cache: "no-store",
   });
   if (!res.ok) {
-    const body = await res.text().catch(() => "");
-    console.error("[contact] Resend error", res.status, body);
-    return { ok: false as const, reason: "email_send_failed", status: res.status, body } as const;
+    return { ok: false as const, reason: "email_send_failed", status: res.status } as const;
   }
   return { ok: true as const };
 }
 
 export async function POST(req: Request) {
   try {
+    const origin = req.headers.get("origin");
+    if (origin && new URL(origin).origin !== new URL(req.url).origin) {
+      return NextResponse.json({ ok: false, error: "invalid_origin" }, { status: 403 });
+    }
+    const contentLength = Number(req.headers.get("content-length") || 0);
+    if (contentLength > 10_000) return NextResponse.json({ ok: false, error: "payload_too_large" }, { status: 413 });
+    const forwarded = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "unknown";
+    if (overLimit(forwarded)) return NextResponse.json({ ok: false, error: "too_many_requests" }, { status: 429 });
     const contentType = req.headers.get("content-type") || "";
     if (!contentType.includes("application/x-www-form-urlencoded") && !contentType.includes("multipart/form-data")) {
       // Gracefully handle JSON for API usage
@@ -109,16 +141,35 @@ export async function POST(req: Request) {
         name?: string;
         email?: string;
         message?: string;
+        phone?: string;
+        age?: string;
+        preferredContact?: string;
+        supportFor?: string;
+        market?: string;
+        consent?: string;
+        company?: string;
       };
-      const name = String(data.name || "").slice(0, 200);
-      const email = String(data.email || "").slice(0, 200);
-      const message = String(data.message || "").slice(0, 5000);
-      if (!name || !email || !message) return NextResponse.json({ ok: false, error: "missing_fields" }, { status: 400 });
+      if (data.company) return NextResponse.json({ ok: true });
+      const name = String(data.name || "").replace(/[\r\n]/g, " ").trim().slice(0, 100);
+      const email = String(data.email || "").trim().slice(0, 200);
+      const message = String(data.message || "").trim().slice(0, 1200);
+      const phone = String(data.phone || "").trim().slice(0, 40);
+      const age = String(data.age || "").trim().slice(0, 2);
+      const preferredContact = String(data.preferredContact || "email");
+      const supportFor = String(data.supportFor || "unsure");
+      const market = String(data.market || "");
+      const validSupport = ["child", "teen", "parent", "unsure"].includes(supportFor);
+      const validAge = !age || /^(?:[1-9]|1[0-9]|20)$/.test(age);
+      const validPreferredContact = ["email", "phone"].includes(preferredContact);
+      const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+      if (!name || !emailOk || !message || data.consent !== "yes" || !validSupport || !validAge || !validPreferredContact || !["QA", "GB", "PL"].includes(market)) {
+        return NextResponse.json({ ok: false, error: "invalid_submission" }, { status: 400 });
+      }
       const to = CONTACT_TO_DEFAULT;
       const from = CONTACT_FROM_DEFAULT;
-      const subject = `New enquiry from ${name}`;
-      const text = `Name: ${name}\nEmail: ${email}\n\n${message}`;
-      const html = buildEmailHtml({ name, email, message });
+      const subject = `New ${market} enquiry from ${name}`;
+      const text = `Market: ${market}\nName: ${name}\nEmail: ${email}\nPhone: ${phone || "Not provided"}\nSeeking support for: ${supportFor}\nAge: ${age || "Not provided"}\nPreferred reply: ${preferredContact}\n\n${message}`;
+      const html = buildEmailHtml({ name, email, message, phone, supportFor, age, preferredContact, market });
       const r = await sendEmail({ from, to, subject, text, html, replyTo: email });
       return NextResponse.json(r, { status: r.ok ? 200 : 500 });
     }
@@ -128,25 +179,32 @@ export async function POST(req: Request) {
     if (form.get("company")) {
       return NextResponse.redirect(new URL("/thanks", req.url));
     }
-    const name = String(form.get("name") || "").trim().slice(0, 200);
+    const name = String(form.get("name") || "").replace(/[\r\n]/g, " ").trim().slice(0, 100);
     const email = String(form.get("email") || "").trim().slice(0, 200);
-    const message = String(form.get("message") || "").trim().slice(0, 5000);
-
+    const message = String(form.get("message") || "").trim().slice(0, 1200);
+    const phone = String(form.get("phone") || "").trim().slice(0, 40);
+    const age = String(form.get("age") || "").trim().slice(0, 2);
+    const preferredContact = String(form.get("preferredContact") || "email");
+    const supportFor = String(form.get("supportFor") || "unsure");
+    const market = String(form.get("market") || "");
+    const validSupport = ["child", "teen", "parent", "unsure"].includes(supportFor);
+    const validAge = !age || /^(?:[1-9]|1[0-9]|20)$/.test(age);
+    const validPreferredContact = ["email", "phone"].includes(preferredContact);
     if (!name || !email || !message) {
       return NextResponse.redirect(new URL("/contact/error", req.url));
     }
 
     // Basic email check
     const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-    if (!emailOk) {
+    if (!emailOk || form.get("consent") !== "yes" || !validSupport || !validAge || !validPreferredContact || !["QA", "GB", "PL"].includes(market)) {
       return NextResponse.redirect(new URL("/contact/error", req.url));
     }
 
     const to = CONTACT_TO_DEFAULT;
     const from = CONTACT_FROM_DEFAULT;
-    const subject = `New enquiry from ${name}`;
-    const text = `Name: ${name}\nEmail: ${email}\n\n${message}`;
-    const html = buildEmailHtml({ name, email, message });
+    const subject = `New ${market} enquiry from ${name}`;
+    const text = `Market: ${market}\nName: ${name}\nEmail: ${email}\nPhone: ${phone || "Not provided"}\nSeeking support for: ${supportFor}\nAge: ${age || "Not provided"}\nPreferred reply: ${preferredContact}\n\n${message}`;
+    const html = buildEmailHtml({ name, email, message, phone, supportFor, age, preferredContact, market });
 
     const result = await sendEmail({ from, to, subject, text, html, replyTo: email });
     if (!result.ok) {

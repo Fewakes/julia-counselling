@@ -1,64 +1,58 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Julia Counselling
 
-## Getting Started
+An international counselling website built with Next.js App Router, TypeScript and Tailwind CSS. It shares a visual system while keeping stable, distinct market routes and content.
 
-First, run the development server:
+## Routes
+
+- `/` — international gateway and x-default SEO page
+- `/qatar/` — Doha-focused experience and service pages
+- `/uk/` — UK-focused information and service pages
+- `/pl/` — Polish-language information and service pages
+
+UK and Poland enquiries are accepted, but current service availability and eligibility are confirmed individually. Professional, regulatory and market-specific details that have not been verified remain marked `NEEDS_VERIFICATION` in `content/markets.ts` and are not shown as public claims.
+
+## Project structure
+
+- `app/` — market layouts, pages, contact API, sitemap and robots routes
+- `components/` — shared shell, market selector, editorial sections and contact form
+- `content/markets.ts` — typed market status, navigation and indexable route lists
+- `content/qatar-home.ts` — editable Qatar homepage copy and information hierarchy
+- `content/media.ts` — central mapping for approved public photography
+- `content/testimonials.ts` — approved-only testimonial data with a production demo-content guard
+- `lib/seo.ts` — page metadata, canonical and homepage hreflang helpers
+- `lib/market-preference.ts` — first-party market preference storage
+- `middleware.ts` — root-only coarse market routing
+
+## Market routing and preference
+
+The international gateway at `/` is always available and does not automatically redirect by IP or browser language. All three market routes are directly accessible. Choosing a country in the selector or a market card saves a first-party preference for the selector UI; it does not trap the visitor or change the content served at a URL.
+
+## Contact and configuration
+
+The enquiry form sends only the market, contact details, support category and the short message to the server-side email integration. The form warns visitors not to submit detailed health information. Analytics hooks accept only event names, market and page path; no analytics provider or tracking ID is configured.
+
+Configure email delivery through environment variables:
+
+- `RESEND_API_KEY`
+- `CONTACT_TO`
+- `CONTACT_FROM`
+- `NEXT_PUBLIC_SITE_URL` (defaults to `https://juliacounselling.com`)
+
+The built-in rate limit is process-local. A shared rate-limit service should be configured before relying on it across multiple server instances.
+
+## Development
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Available checks:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+npm run lint
+npx tsc --noEmit
+npm run build
+```
 
-## Project structure (custom additions)
-
-- `app/` – App Router pages and routes
-  - `app/page.tsx` – Landing page (sections are componentized and responsive)
-  - `app/api/contact/route.ts` – Serverless email endpoint for the contact form
-  - `app/thanks/page.tsx` – Contact success page
-  - `app/contact/error/page.tsx` – Contact error page
-- `components/` – Reusable UI
-  - `SectionHeader.tsx` – Consistent section titles + underline accent
-  - `Reveal.tsx` – IntersectionObserver reveal-on-scroll wrapper
-- `data/content.ts` – Central place to manage image paths and copy (hero, gallery, services, testimonials)
-- `public/` – Static assets (e.g., `julia.jpeg`, `Image1.jpg`, `adulttherapy.jpeg`)
-
-## Content updates
-
-- Hero photo: replace `public/julia.jpeg` and it will update automatically.
-- Gallery: update `public/Image1.jpg`, `public/Image2.jpeg`, `public/Image3.jpg`.
-- Service images: `public/adulttherapy.jpeg`, `public/childrentherapy.jpg`, `public/traumatherapy.jpg`.
-- Testimonials: update quotes/avatars in `data/content.ts` if you prefer managing content centrally.
-
-## SEO & performance
-
-- Metadata: set in `app/layout.tsx` (title, description, icons, OpenGraph/Twitter).
-- Sitemap/robots: `app/sitemap.ts` and `app/robots.txt`.
-- Structured data (JSON-LD): embedded in `app/page.tsx`.
-- Images: local images use `next/image`; remote Unsplash domains are allowed via `next.config.ts`.
-- Smooth scrolling: enabled with header offset in `app/globals.css`.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Canonical URLs, homepage hreflang, sitemap entries and redirect mappings are maintained in `lib/seo.ts`, `content/markets.ts`, `app/sitemap.ts` and `next.config.ts`.
