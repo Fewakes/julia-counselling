@@ -29,7 +29,7 @@ The international gateway at `/` is always available and does not automatically 
 
 ## Contact and configuration
 
-The enquiry form sends only the market, contact details, support category and the short message to the server-side email integration. The form warns visitors not to submit detailed health information. Analytics hooks accept only event names, market and page path; no analytics provider or tracking ID is configured.
+The enquiry form sends the market, contact details, optional age and preferred reply method, support category, and short message to the server-side email integration. The form warns visitors not to submit detailed health information. Analytics hooks accept only event names, market and page path; no analytics provider or tracking ID is configured.
 
 Configure email delivery through environment variables:
 
@@ -37,6 +37,10 @@ Configure email delivery through environment variables:
 - `CONTACT_TO`
 - `CONTACT_FROM`
 - `NEXT_PUBLIC_SITE_URL` (defaults to `https://juliacounselling.com`)
+
+For Vercel, add all four values in Project Settings → Environment Variables for Production (and Preview if preview forms should work). `CONTACT_FROM` must use a sender domain verified in Resend; the Resend sandbox sender only works within Resend's testing restrictions. Redeploy after changing environment variables. Check the Vercel Function logs for `[contact]` errors and Resend's email logs if a submission is accepted but not delivered.
+
+Vercel builds use Node.js 24.x as pinned in `package.json` and `npm run build` (`next build --turbopack`).
 
 The built-in rate limit is process-local. A shared rate-limit service should be configured before relying on it across multiple server instances.
 

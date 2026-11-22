@@ -119,6 +119,12 @@ async function sendEmail(opts: {
     cache: "no-store",
   });
   if (!res.ok) {
+    const providerError = (await res.json().catch(() => null)) as { name?: string; message?: string; statusCode?: number } | null;
+    console.error("[contact] Resend rejected the enquiry", {
+      status: res.status,
+      code: providerError?.name,
+      message: providerError?.message,
+    });
     return { ok: false as const, reason: "email_send_failed", status: res.status } as const;
   }
   return { ok: true as const };
@@ -127,8 +133,24 @@ async function sendEmail(opts: {
 export async function POST(req: Request) {
   try {
     const origin = req.headers.get("origin");
-    if (origin && new URL(origin).origin !== new URL(req.url).origin) {
-      return NextResponse.json({ ok: false, error: "invalid_origin" }, { status: 403 });
+    if (origin) {
+      const requestUrl = new URL(req.url);
+      const forwardedHost = req.headers.get("x-forwarded-host")?.split(",")[0]?.trim();
+      const host = forwardedHost || req.headers.get("host");
+      const forwardedProtocol = req.headers.get("x-forwarded-proto")?.split(",")[0]?.trim();
+      const requestOrigin = host ? `${forwardedProtocol || requestUrl.protocol.slice(0, -1)}://${host}` : requestUrl.origin;
+      const allowedOrigins = new Set([requestUrl.origin, requestOrigin, new URL(siteUrl).origin]);
+      if (process.env.VERCEL_URL) allowedOrigins.add(`https://${process.env.VERCEL_URL}`);
+      let submittedOrigin: string;
+      try {
+        submittedOrigin = new URL(origin).origin;
+      } catch {
+        return NextResponse.json({ ok: false, error: "invalid_origin" }, { status: 403 });
+      }
+      if (!allowedOrigins.has(submittedOrigin)) {
+        console.warn("[contact] Rejected cross-origin form submission");
+        return NextResponse.json({ ok: false, error: "invalid_origin" }, { status: 403 });
+      }
     }
     const contentLength = Number(req.headers.get("content-length") || 0);
     if (contentLength > 10_000) return NextResponse.json({ ok: false, error: "payload_too_large" }, { status: 413 });
